@@ -8,15 +8,16 @@ from pydoc import locate
 
 from calvin_agent.models.mcil import MCIL
 from calvin_agent.utils.utils import add_text, format_sftp_path
+from calvin_agent.utils.pyhash_replacement import fnv1_32_hasher
 import cv2
 import hydra
 import numpy as np
 from numpy import pi
 from omegaconf import OmegaConf
-import pyhash
+# import pyhash
 import torch
 
-hasher = pyhash.fnv1_32()
+hasher = fnv1_32_hasher()
 logger = logging.getLogger(__name__)
 
 

@@ -10,13 +10,15 @@ from calvin_agent.datasets.utils.episode_utils import (
     process_rgb,
     process_state,
 )
+from calvin_agent.utils.pyhash_replacement import fnv1_32_hasher
 import numpy as np
 from omegaconf import DictConfig
-import pyhash
+# import pyhash
 import torch
 from torch.utils.data import Dataset
 
-hasher = pyhash.fnv1_32()
+# hasher = pyhash.fnv1_32()
+hasher = fnv1_32_hasher()
 logger = logging.getLogger(__name__)
 
 
