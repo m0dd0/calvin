@@ -6,6 +6,8 @@ from itertools import product
 import logging
 import multiprocessing
 from operator import add
+from pathlib import Path
+import json
 
 from calvin_agent.evaluation.utils import temp_seed
 import numpy as np
@@ -51,28 +53,95 @@ task_categories = {
 }
 
 tasks = {
-    "rotate_red_block_right": [{"condition": {"red_block": "table", "grasped": 0}, "effect": {"red_block": "table"}}],
-    "rotate_red_block_left": [{"condition": {"red_block": "table", "grasped": 0}, "effect": {"red_block": "table"}}],
+    "rotate_red_block_right": [
+        {
+            "condition": {"red_block": "table", "grasped": 0},
+            "effect": {"red_block": "table"},
+        }
+    ],
+    "rotate_red_block_left": [
+        {
+            "condition": {"red_block": "table", "grasped": 0},
+            "effect": {"red_block": "table"},
+        }
+    ],
     "rotate_blue_block_right": [
-        {"condition": {"blue_block": "table", "grasped": 0}, "effect": {"blue_block": "table"}}
+        {
+            "condition": {"blue_block": "table", "grasped": 0},
+            "effect": {"blue_block": "table"},
+        }
     ],
-    "rotate_blue_block_left": [{"condition": {"blue_block": "table", "grasped": 0}, "effect": {"blue_block": "table"}}],
+    "rotate_blue_block_left": [
+        {
+            "condition": {"blue_block": "table", "grasped": 0},
+            "effect": {"blue_block": "table"},
+        }
+    ],
     "rotate_pink_block_right": [
-        {"condition": {"pink_block": "table", "grasped": 0}, "effect": {"pink_block": "table"}}
+        {
+            "condition": {"pink_block": "table", "grasped": 0},
+            "effect": {"pink_block": "table"},
+        }
     ],
-    "rotate_pink_block_left": [{"condition": {"pink_block": "table", "grasped": 0}, "effect": {"pink_block": "table"}}],
-    "push_red_block_right": [{"condition": {"red_block": "table", "grasped": 0}, "effect": {"red_block": "table"}}],
-    "push_red_block_left": [{"condition": {"red_block": "table", "grasped": 0}, "effect": {"red_block": "table"}}],
-    "push_blue_block_right": [{"condition": {"blue_block": "table", "grasped": 0}, "effect": {"blue_block": "table"}}],
-    "push_blue_block_left": [{"condition": {"blue_block": "table", "grasped": 0}, "effect": {"blue_block": "table"}}],
-    "push_pink_block_right": [{"condition": {"pink_block": "table", "grasped": 0}, "effect": {"pink_block": "table"}}],
-    "push_pink_block_left": [{"condition": {"pink_block": "table", "grasped": 0}, "effect": {"pink_block": "table"}}],
-    "move_slider_left": [{"condition": {"slider": "right", "grasped": 0}, "effect": {"slider": "left"}}],
-    "move_slider_right": [{"condition": {"slider": "left", "grasped": 0}, "effect": {"slider": "right"}}],
-    "open_drawer": [{"condition": {"drawer": "closed", "grasped": 0}, "effect": {"drawer": "open"}}],
-    "close_drawer": [{"condition": {"drawer": "open", "grasped": 0}, "effect": {"drawer": "closed"}}],
+    "rotate_pink_block_left": [
+        {
+            "condition": {"pink_block": "table", "grasped": 0},
+            "effect": {"pink_block": "table"},
+        }
+    ],
+    "push_red_block_right": [
+        {
+            "condition": {"red_block": "table", "grasped": 0},
+            "effect": {"red_block": "table"},
+        }
+    ],
+    "push_red_block_left": [
+        {
+            "condition": {"red_block": "table", "grasped": 0},
+            "effect": {"red_block": "table"},
+        }
+    ],
+    "push_blue_block_right": [
+        {
+            "condition": {"blue_block": "table", "grasped": 0},
+            "effect": {"blue_block": "table"},
+        }
+    ],
+    "push_blue_block_left": [
+        {
+            "condition": {"blue_block": "table", "grasped": 0},
+            "effect": {"blue_block": "table"},
+        }
+    ],
+    "push_pink_block_right": [
+        {
+            "condition": {"pink_block": "table", "grasped": 0},
+            "effect": {"pink_block": "table"},
+        }
+    ],
+    "push_pink_block_left": [
+        {
+            "condition": {"pink_block": "table", "grasped": 0},
+            "effect": {"pink_block": "table"},
+        }
+    ],
+    "move_slider_left": [
+        {"condition": {"slider": "right", "grasped": 0}, "effect": {"slider": "left"}}
+    ],
+    "move_slider_right": [
+        {"condition": {"slider": "left", "grasped": 0}, "effect": {"slider": "right"}}
+    ],
+    "open_drawer": [
+        {"condition": {"drawer": "closed", "grasped": 0}, "effect": {"drawer": "open"}}
+    ],
+    "close_drawer": [
+        {"condition": {"drawer": "open", "grasped": 0}, "effect": {"drawer": "closed"}}
+    ],
     "lift_red_block_table": [
-        {"condition": {"red_block": "table", "grasped": 0}, "effect": {"red_block": "grasped", "grasped": 1}}
+        {
+            "condition": {"red_block": "table", "grasped": 0},
+            "effect": {"red_block": "grasped", "grasped": 1},
+        }
     ],
     "lift_red_block_slider": [
         {
@@ -91,7 +160,10 @@ tasks = {
         }
     ],
     "lift_blue_block_table": [
-        {"condition": {"blue_block": "table", "grasped": 0}, "effect": {"blue_block": "grasped", "grasped": 1}}
+        {
+            "condition": {"blue_block": "table", "grasped": 0},
+            "effect": {"blue_block": "grasped", "grasped": 1},
+        }
     ],
     "lift_blue_block_slider": [
         {
@@ -110,7 +182,10 @@ tasks = {
         }
     ],
     "lift_pink_block_table": [
-        {"condition": {"pink_block": "table", "grasped": 0}, "effect": {"pink_block": "grasped", "grasped": 1}}
+        {
+            "condition": {"pink_block": "table", "grasped": 0},
+            "effect": {"pink_block": "grasped", "grasped": 1},
+        }
     ],
     "lift_pink_block_slider": [
         {
@@ -171,57 +246,109 @@ tasks = {
     "stack_block": [
         {
             "condition": {"red_block": "grasped", "blue_block": "table", "grasped": 1},
-            "effect": {"red_block": "stacked_top", "blue_block": "stacked_bottom", "grasped": 0},
+            "effect": {
+                "red_block": "stacked_top",
+                "blue_block": "stacked_bottom",
+                "grasped": 0,
+            },
         },
         {
             "condition": {"red_block": "grasped", "pink_block": "table", "grasped": 1},
-            "effect": {"red_block": "stacked_top", "pink_block": "stacked_bottom", "grasped": 0},
+            "effect": {
+                "red_block": "stacked_top",
+                "pink_block": "stacked_bottom",
+                "grasped": 0,
+            },
         },
         {
             "condition": {"blue_block": "grasped", "red_block": "table", "grasped": 1},
-            "effect": {"blue_block": "stacked_top", "red_block": "stacked_bottom", "grasped": 0},
+            "effect": {
+                "blue_block": "stacked_top",
+                "red_block": "stacked_bottom",
+                "grasped": 0,
+            },
         },
         {
             "condition": {"blue_block": "grasped", "pink_block": "table", "grasped": 1},
-            "effect": {"blue_block": "stacked_top", "pink_block": "stacked_bottom", "grasped": 0},
+            "effect": {
+                "blue_block": "stacked_top",
+                "pink_block": "stacked_bottom",
+                "grasped": 0,
+            },
         },
         {
             "condition": {"pink_block": "grasped", "red_block": "table", "grasped": 1},
-            "effect": {"pink_block": "stacked_top", "red_block": "stacked_bottom", "grasped": 0},
+            "effect": {
+                "pink_block": "stacked_top",
+                "red_block": "stacked_bottom",
+                "grasped": 0,
+            },
         },
         {
             "condition": {"pink_block": "grasped", "blue_block": "table", "grasped": 1},
-            "effect": {"pink_block": "stacked_top", "blue_block": "stacked_bottom", "grasped": 0},
+            "effect": {
+                "pink_block": "stacked_top",
+                "blue_block": "stacked_bottom",
+                "grasped": 0,
+            },
         },
     ],
     "unstack_block": [
         {
-            "condition": {"red_block": "stacked_top", "blue_block": "stacked_bottom", "grasped": 0},
+            "condition": {
+                "red_block": "stacked_top",
+                "blue_block": "stacked_bottom",
+                "grasped": 0,
+            },
             "effect": {"red_block": "table", "blue_block": "table"},
         },
         {
-            "condition": {"red_block": "stacked_top", "pink_block": "stacked_bottom", "grasped": 0},
+            "condition": {
+                "red_block": "stacked_top",
+                "pink_block": "stacked_bottom",
+                "grasped": 0,
+            },
             "effect": {"red_block": "table", "pink_block": "table"},
         },
         {
-            "condition": {"blue_block": "stacked_top", "red_block": "stacked_bottom", "grasped": 0},
+            "condition": {
+                "blue_block": "stacked_top",
+                "red_block": "stacked_bottom",
+                "grasped": 0,
+            },
             "effect": {"blue_block": "table", "red_block": "table"},
         },
         {
-            "condition": {"blue_block": "stacked_top", "pink_block": "stacked_bottom", "grasped": 0},
+            "condition": {
+                "blue_block": "stacked_top",
+                "pink_block": "stacked_bottom",
+                "grasped": 0,
+            },
             "effect": {"blue_block": "table", "pink_block": "table"},
         },
         {
-            "condition": {"pink_block": "stacked_top", "red_block": "stacked_bottom", "grasped": 0},
+            "condition": {
+                "pink_block": "stacked_top",
+                "red_block": "stacked_bottom",
+                "grasped": 0,
+            },
             "effect": {"pink_block": "table", "red_block": "table"},
         },
         {
-            "condition": {"pink_block": "stacked_top", "blue_block": "stacked_bottom", "grasped": 0},
+            "condition": {
+                "pink_block": "stacked_top",
+                "blue_block": "stacked_bottom",
+                "grasped": 0,
+            },
             "effect": {"pink_block": "table", "blue_block": "table"},
         },
     ],
-    "turn_on_lightbulb": [{"condition": {"lightbulb": 0, "grasped": 0}, "effect": {"lightbulb": 1}}],
-    "turn_off_lightbulb": [{"condition": {"lightbulb": 1, "grasped": 0}, "effect": {"lightbulb": 0}}],
+    "turn_on_lightbulb": [
+        {"condition": {"lightbulb": 0, "grasped": 0}, "effect": {"lightbulb": 1}}
+    ],
+    "turn_off_lightbulb": [
+        {"condition": {"lightbulb": 1, "grasped": 0}, "effect": {"lightbulb": 0}}
+    ],
     "turn_on_led": [{"condition": {"led": 0, "grasped": 0}, "effect": {"led": 1}}],
     "turn_off_led": [{"condition": {"led": 1, "grasped": 0}, "effect": {"led": 0}}],
     "push_into_drawer": [
@@ -360,19 +487,34 @@ def get_sequences(num_sequences=1000, num_workers=None):
         "grasped": [0],
     }
 
-    f = lambda l: l.count("table") in [1, 2] and l.count("slider_right") < 2 and l.count("slider_left") < 2
+    f = lambda l: (
+        l.count("table") in [1, 2]
+        and l.count("slider_right") < 2
+        and l.count("slider_left") < 2
+    )
     value_combinations = filter(f, product(*possible_conditions.values()))
-    initial_states = [dict(zip(possible_conditions.keys(), vals)) for vals in value_combinations]
+    initial_states = [
+        dict(zip(possible_conditions.keys(), vals)) for vals in value_combinations
+    ]
 
-    num_sequences_per_state = list(map(len, np.array_split(range(num_sequences), len(initial_states))))
+    num_sequences_per_state = list(
+        map(len, np.array_split(range(num_sequences), len(initial_states)))
+    )
     logger.info("Start generating evaluation sequences.")
     # set the numpy seed temporarily to 0
     with temp_seed(0):
-        num_workers = multiprocessing.cpu_count() if num_workers is None else num_workers
+        num_workers = (
+            multiprocessing.cpu_count() if num_workers is None else num_workers
+        )
         with ProcessPoolExecutor(max_workers=num_workers) as executor:
             results = flatten(
                 executor.map(
-                    get_sequences_for_state2, zip(initial_states, num_sequences_per_state, range(len(initial_states)))
+                    get_sequences_for_state2,
+                    zip(
+                        initial_states,
+                        num_sequences_per_state,
+                        range(len(initial_states)),
+                    ),
                 )
             )
         results = list(zip(np.repeat(initial_states, num_sequences_per_state), results))
@@ -380,6 +522,34 @@ def get_sequences(num_sequences=1000, num_workers=None):
     logger.info("Done generating evaluation sequences.")
 
     return results
+
+
+def get_original_initial_evaluation_conditions() -> list[
+    tuple[dict[str, int | str], list[str], np.ndarray, np.ndarray]
+]:
+    """Returns the initial consitions that are used for evaluation.
+
+    This function returns the same values as one would obtain by running the get_sequences function and then 
+    taking the initial state of each sequence and converting it to the corresponding robot_obs and scene_obs 
+    using the get_env_state_for_initial_condition function. The reason for having this function is that it 
+    that the pyhash function that is used for generating those values is heavily outdated and the more modern 
+    replacements of pyhash that might be used in this codebase in future are not guaranteed to produce the 
+    same values, which would make it impossible to reproduce the exact same evaluation sequences for benchmarking.
+    By having this function, we can ensure that we can always get the same initial conditions for evaluation, 
+    even if the underlying implementation of the hashing function changes.
+    
+    Returns:
+        list of tuples, where each tuple contains the initial state as a dict, the sequence of language instructions, 
+            the corresponding robot_obs and scene_obs as numpy arrays.
+    """
+    initial_conditions = json.load(
+        open(Path(__file__).parent / "initial_conditions.json")
+    )
+    initial_conditions = [
+        (initial_state, task_sequence, np.array(robot_obs), np.array(scene_obs))
+        for initial_state, task_sequence, robot_obs, scene_obs in initial_conditions
+    ]
+    return initial_conditions
 
 
 if __name__ == "__main__":
@@ -390,7 +560,7 @@ if __name__ == "__main__":
             counters[i][task] += 1
 
     for i, counter in enumerate(counters):
-        print(f"Task {i+1}")
+        print(f"Task {i + 1}")
         print()
         for task, freq in sorted(counter.items(), key=lambda x: x[1], reverse=True):
             print(f"{task}: {freq / sum(counter.values()) * 100:.2f}")
