@@ -1,0 +1,4 @@
+graft conf
+recursive-include calvin_agent *.json
+global-exclude *.pyc
+global-exclude __pycache__

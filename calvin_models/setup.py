@@ -37,7 +37,12 @@ meta = dict(
     author=find_meta(_meta, "__author__"),
     author_email=find_meta(_meta, "__email__"),
     url=" https://github.com/mees/calvin",
-    packages=find_packages(exclude=["tests"]),
+    packages=find_packages(exclude=["tests"]) + ["conf"],
+    include_package_data=True,
+    package_data={
+        "calvin_agent": ["**/*.json"],
+        "conf": ["**/*.yaml", "**/*.yml"],
+    },
     install_requires=install_requires,
 )
 
