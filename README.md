@@ -1,3 +1,12 @@
+### Changes made on this fork
+- Removed `pyhash` dependency and replaced it with minimal own implementation of `fnv1_32_hasher` that works _not_ exactly the same but produces the same hashes for ~95% of the cases.
+- Added `initial_evaluation_condition.json` and a corresponding `get_original_initial_evaluation_conditions()` functions to obtain the exact same initial consitions that would have been created with the use of the original `pyhash` implementation.
+- Added some package data (`conf`, ...) to the installable files so that they are also available in non-editable installs.
+- Added a prebuilt `wheel`file for `pyhash` that simplifies installation of `pyhash` with modern `setuptools` in case one wants to switch back to the original `pyhash` implementation. 
+- Autoformatted some files.
+- Removed `MulticoreTSNE` dependecy and unpinned fixed versions in `requirements.txt`.
+- Uses forked version of `calvin_env` that also works with non-editable install.
+
 # CALVIN
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/mees/calvin.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mees/calvin/context:python)
