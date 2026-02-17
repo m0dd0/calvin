@@ -543,7 +543,7 @@ def get_original_initial_evaluation_conditions() -> list[
             the corresponding robot_obs and scene_obs as numpy arrays.
     """
     initial_conditions = json.load(
-        open(Path(__file__).parent / "initial_conditions.json")
+        open(Path(__file__).parent / "initial_evaluation_conditions.json")
     )
     initial_conditions = [
         (initial_state, task_sequence, np.array(robot_obs), np.array(scene_obs))
