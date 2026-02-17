@@ -539,8 +539,11 @@ def get_original_initial_evaluation_conditions() -> list[
     even if the underlying implementation of the hashing function changes.
     
     Returns:
-        list of tuples, where each tuple contains the initial state as a dict, the sequence of language instructions, 
-            the corresponding robot_obs and scene_obs as numpy arrays.
+        list of tuples, where each tuple contains 
+            - the initial state as a dict, 
+            - the sequence of language instructions, 
+            - the corresponding robot_obs and 
+            - scene_obs as numpy arrays.
     """
     initial_conditions = json.load(
         open(Path(__file__).parent / "initial_evaluation_conditions.json")
